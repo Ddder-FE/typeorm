@@ -5,6 +5,7 @@ import {OracleDriver} from "./oracle/OracleDriver";
 import {SqliteDriver} from "./sqlite/SqliteDriver";
 import {CordovaDriver} from "./cordova/CordovaDriver";
 import {ReactNativeDriver} from "./react-native/ReactNativeDriver";
+import { DdderDriver } from "./ddder/DdderDriver";
 import {SqljsDriver} from "./sqljs/SqljsDriver";
 import {MysqlDriver} from "./mysql/MysqlDriver";
 import {PostgresDriver} from "./postgres/PostgresDriver";
@@ -34,6 +35,8 @@ export class DriverFactory {
                 return new CordovaDriver(connection);
             case "react-native":
                 return new ReactNativeDriver(connection);
+            case "ddder":
+                return new DdderDriver(connection);
             case "sqljs":
                 return new SqljsDriver(connection);
             case "oracle":

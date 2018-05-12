@@ -7,6 +7,7 @@ import {MongoConnectionOptions} from "../driver/mongodb/MongoConnectionOptions";
 import {CordovaConnectionOptions} from "../driver/cordova/CordovaConnectionOptions";
 import {SqljsConnectionOptions} from "../driver/sqljs/SqljsConnectionOptions";
 import {ReactNativeConnectionOptions} from "../driver/react-native/ReactNativeConnectionOptions";
+import { DdderConnectionOptions } from "../driver/ddder/DdderConnectionOptions";
 
 /**
  * ConnectionOptions is an interface with settings and options for specific connection.
@@ -21,5 +22,6 @@ export type ConnectionOptions =
     OracleConnectionOptions|
     CordovaConnectionOptions|
     ReactNativeConnectionOptions|
+    DdderConnectionOptions|
     SqljsConnectionOptions|
     MongoConnectionOptions;

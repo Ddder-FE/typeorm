@@ -1,7 +1,7 @@
 {
-  "name": "typeorm",
+  "name": "@ddder/typeorm",
   "private": true,
-  "version": "0.2.5",
+  "version": "0.2.5-ddder.2",
   "description": "Data-Mapper ORM for TypeScript, ES7, ES6, ES5. Supports MySQL, PostgreSQL, MariaDB, SQLite, MS SQL Server, Oracle, MongoDB databases.",
   "license": "MIT",
   "readmeFilename": "README.md",
@@ -11,7 +11,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/typeorm/typeorm.git"
+    "url": "https://github.com/Ddder-FE/typeorm.git"
   },
   "bugs": {
     "url": "https://github.com/typeorm/typeorm/issues"
@@ -62,6 +62,7 @@
     "mssql": "^4.1.0",
     "mysql": "^2.15.0",
     "mysql2": "^1.5.3",
+    "npm": "^6.0.1",
     "pg": "^7.4.0",
     "redis": "^2.8.0",
     "remap-istanbul": "^0.11.0",
@@ -101,10 +102,8 @@
     "test-ci": "gulp ci-tests",
     "test": "tsc && mocha --file ./build/compiled/test/utils/test-setup.js --bail --recursive --timeout 30000  ./build/compiled/test",
     "compile": "tsc",
-    "package": "gulp package"
-  },
-  "bin": {
-    "typeorm": "./cli.js"
+    "package": "gulp package",
+    "ddder-package": "gulp ddderPackage"
   },
   "collective": {
     "type": "opencollective",

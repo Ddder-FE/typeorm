@@ -71,6 +71,19 @@ export class Gulpfile {
         .pipe(gulp.dest("./build/browser/src"));
     }
 
+    @Task()
+    ddderCopySources() {
+        return gulp.src([
+            "./src/**/*.ts",
+            "!./src/commands/*.ts",
+            "!./src/cli.ts",
+            "!./src/typeorm.ts",
+            "!./src/typeorm-model-shim.ts",
+            "!./src/platform/PlatformTools.ts"
+        ])
+            .pipe(gulp.dest("./build/src"));
+    }
+
     /**
      * Replaces PlatformTools with browser-specific implementation called BrowserPlatformTools.
      */
@@ -79,6 +92,13 @@ export class Gulpfile {
         return gulp.src("./src/platform/BrowserPlatformTools.template")
             .pipe(rename("PlatformTools.ts"))
             .pipe(gulp.dest("./build/browser/src/platform"));
+    }
+
+    @Task()
+    ddderCopyPlatformTools() {
+        return gulp.src("./src/platform/DdderPlatformTools.ts")
+            .pipe(rename("PlatformTools.ts"))
+            .pipe(gulp.dest("./build/src/platform"));
     }
 
     @MergedTask()
@@ -100,10 +120,45 @@ export class Gulpfile {
         ];
     }
 
+    @MergedTask()
+    ddderCompile() {
+        const tsProject = ts.createProject("tsconfig.json", {
+            module: "commonjs",
+            target: "es5",
+            "lib": [
+                "ES6",
+                "ES5",
+                "ScriptHost",
+
+                "ES2015.Collection",
+                "ES2015.Generator",
+                "ES2015.Promise"
+            ],
+            typescript: require("typescript")
+        });
+        const tsResult = gulp.src(["./build/src/**/*.ts", "./node_modules/reflect-metadata/**/*.d.ts", "./node_modules/@types/**/*.ts"])
+            .pipe(sourcemaps.init())
+            .pipe(tsProject());
+
+        return [
+            tsResult.dts.pipe(gulp.dest("./build/package")),
+            tsResult.js
+                .pipe(sourcemaps.write(".", { sourceRoot: "", includeContent: true }))
+                .pipe(gulp.dest("./build/package"))
+        ];
+    }
+
     @Task()
     browserClearPackageDirectory(cb: Function) {
         return del([
             "./build/browser/**"
+        ]);
+    }
+
+    @Task()
+    ddderClearPackageDirectory(cb: Function) {
+        return del([
+            "./build/src/**"
         ]);
     }
 
@@ -119,6 +174,14 @@ export class Gulpfile {
         return gulp.src("package.json", { read: false })
             .pipe(shell([
                 "cd ./build/package && npm publish"
+            ]));
+    }
+
+    @Task()
+    ddderPackagePublish() {
+        return gulp.src("package.json", { read: false })
+            .pipe(shell([
+                "cd ./build/package && npm publish --access=public"
             ]));
     }
 
@@ -196,7 +259,7 @@ export class Gulpfile {
      */
     @Task()
     packageCopyReadme() {
-        return gulp.src("./README.md")
+        return gulp.src(["./README.md", "./README-zh_CN.md"])
             .pipe(replace(/```typescript([\s\S]*?)```/g, "```javascript$1```"))
             .pipe(gulp.dest("./build/package"));
     }
@@ -218,11 +281,30 @@ export class Gulpfile {
         return [
             "clean",
             ["browserCopySources", "browserCopyPlatformTools"],
-            ["packageCompile", "browserCompile"],
+            ["ddderCopySources", "ddderCopyPlatformTools"],
+            ["packageCompile", "browserCompile", "ddderCompile"],
             "packageMoveCompiledFiles",
             [
                 "browserClearPackageDirectory",
+                "ddderClearPackageDirectory",
                 "packageClearPackageDirectory",
+                "packageReplaceReferences",
+                "packagePreparePackageFile",
+                "packageCopyReadme",
+                "packageCopyShims"
+            ],
+        ];
+    }
+
+    @SequenceTask()
+    ddderPackage() {
+        return [
+            "clean",
+            ["ddderCopySources", "ddderCopyPlatformTools"],
+            ["ddderCompile"],
+            "packageMoveCompiledFiles",
+            [
+                "ddderClearPackageDirectory",
                 "packageReplaceReferences",
                 "packagePreparePackageFile",
                 "packageCopyReadme",
@@ -237,6 +319,11 @@ export class Gulpfile {
     @SequenceTask()
     publish() {
         return ["package", "packagePublish"];
+    }
+
+    @SequenceTask()
+    ddderPublish() {
+        return ["ddderPackage", "ddderPackagePublish"];
     }
 
     /**
